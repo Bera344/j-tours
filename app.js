@@ -1,27 +1,62 @@
-const express = require("express")
-const fs = require("fs")
+
+const { config } = require('dotenv')
+const express = require('express')
+const morgan = require('morgan')
+
+const tourRouter = require('./routes/tourRoutes')
+const userRouter = require('./routes/userRoutes')
+
 
 const app = express()
 
-app.get("/", (req, res) => {
-    res.json({
-        message: "Hello from the server side :)",
-        app: "jTours"
-    })
+
+
+// 1) MIDDELWARE
+// middelware - mes req, res
+//nese plotesohet ai kusht nga  atehere behet ai action
+console.log(process.env.NODE_ENV)
+
+if(process.env.NODE_ENV === "development"){
+    app.use(morgan('dev'))
+}
+
+app.use(express.json())
+
+//middleware per casje ne fajlla statik te HTML
+app.use(express.static(`${__dirname}`))
+
+//dev eshte development
+app.use(morgan('dev'))
+
+
+
+
+
+
+
+
+
+
+
+
+app.use((req, res, next) => {
+    console.log("Hello from the middelware")
+    next()
 })
 
-app.post("/", (req, res) => {
-    res.send("You can post to this URL")
+app.use((req, res, next) => {
+    req.requestTime = new Date().toISOString()
+    next()
 })
 
 
-
-//2 funksione i pari e konverton ne json file edhe tjetra i merr te dhenat nga path
-const tours = JSON.parse(fs.readFileSync("$_dirname}/dev-data/data/tours-simple.js"))
+// 2) ROUTE HANDLERS
 
 
 
+// 3) ROUTE
 
-app.listen(3000, () => {
-    console.log("Server is listening!")
-})
+app.use('/api/v1/tours', tourRouter)
+app.use('/api/v1/users', userRouter)
+
+module.exports = app
