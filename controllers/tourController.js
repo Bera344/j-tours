@@ -11,6 +11,8 @@ exports.getAllTours = async (req, res) => {
 
         res.json({
             status: "success",
+            //"tours.length" kjo na tregon sa tours i kemi
+            results: tours.length,
             data: { tours }
             // requested: req.requestTime,
         })
